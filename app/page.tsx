@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface SchoolInfo {
   SD_SCHUL_CODE: string;  // 행정표준코드
@@ -17,7 +17,6 @@ interface SchoolInfoResponse {
 }
 
 export default function Home() {
-  const router = useRouter();
   const [schoolName, setSchoolName] = useState<string>('');
   const [searchResults, setSearchResults] = useState<SchoolInfo[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -127,20 +126,19 @@ export default function Home() {
                 {searchResults.map((school) => (
                   <li
                     key={school.SD_SCHUL_CODE}
-                    onClick={() => router.push(
-                      `/school?code=${encodeURIComponent(school.SD_SCHUL_CODE)}&name=${encodeURIComponent(school.SCHUL_NM)}`
-                    )}
                     className="py-4 hover:bg-blue-50 cursor-pointer
                       rounded-lg px-3 transition-all duration-200"
                   >
-                    <div className="flex flex-col">
-                      <span className="font-medium text-blue-900 text-lg">
-                        {school.SCHUL_NM}
-                      </span>
-                      <span className="text-sm text-blue-600 mt-1">
-                        {school.ORG_RDNMA}
-                      </span>
-                    </div>
+                    <Link href={{ pathname: '/school', query: { code: school.SD_SCHUL_CODE, name: school.SCHUL_NM } }}>
+                      <div className="flex flex-col">
+                        <span className="font-medium text-blue-900 text-lg">
+                          {school.SCHUL_NM}
+                        </span>
+                        <span className="text-sm text-blue-600 mt-1">
+                          {school.ORG_RDNMA}
+                        </span>
+                      </div>
+                    </Link>
                   </li>
                 ))}
               </ul>
