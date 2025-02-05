@@ -16,8 +16,38 @@ interface SchoolInfoResponse {
   ]
 }
 
+interface EducationOffice {
+  code: string;
+  name: string;
+}
+
+const EDUCATION_OFFICES: EducationOffice[] = [
+  { code: '', name: '전체' },
+  { code: 'B10', name: '서울특별시교육청' },
+  { code: 'C10', name: '부산광역시교육청' },
+  { code: 'D10', name: '대구광역시교육청' },
+  { code: 'E10', name: '인천광역시교육청' },
+  { code: 'F10', name: '광주광역시교육청' },
+  { code: 'G10', name: '대전광역시교육청' },
+  { code: 'H10', name: '울산광역시교육청' },
+  { code: 'I10', name: '세종특별자치시교육청' },
+  { code: 'J10', name: '경기도교육청' },
+  { code: 'K10', name: '강원특별자치도교육청' },
+  { code: 'M10', name: '충청북도교육청' },
+  { code: 'N10', name: '충청남도교육청' },
+  { code: 'P10', name: '전북특별자치도교육청' },
+  { code: 'Q10', name: '전라남도교육청' },
+  { code: 'R10', name: '경상북도교육청' },
+  { code: 'S10', name: '경상남도교육청' },
+  { code: 'T10', name: '제주특별자치도교육청' },
+  { code: 'V10', name: '재외한국학교교육청' },
+];
+
+
+
 export default function Home() {
   const [schoolName, setSchoolName] = useState<string>('');
+  const [office, setOffice] = useState<string>('');
   const [searchResults, setSearchResults] = useState<SchoolInfo[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [totalResults, setTotalResults] = useState<number>(0);
@@ -27,9 +57,14 @@ export default function Home() {
 
     setIsSearching(true);
     try {
-      const response = await fetch(
-        `https://open.neis.go.kr/hub/schoolInfo?Type=json&pSize=5&SCHUL_NM=${encodeURIComponent(schoolName)}`
-      );
+      const url = new URL('https://open.neis.go.kr/hub/schoolInfo');
+      url.searchParams.set('Type', 'json');
+      url.searchParams.set('SCHUL_NM', schoolName);
+      if (office) {
+        url.searchParams.set('ATPT_OFCDC_SC_CODE', office);
+      }
+
+      const response = await fetch(url);
       const data: SchoolInfoResponse = await response.json();
 
       if (data.schoolInfo) {
@@ -75,26 +110,52 @@ export default function Home() {
           <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8
             border border-blue-100">
             <form onSubmit={handleSearch} className="space-y-6">
-              <div>
-                <label htmlFor="schoolName"
-                  className="block text-lg font-medium text-blue-900 mb-2">
-                  학교 검색
-                </label>
-                <input
-                  type="text"
-                  id="schoolName"
-                  value={schoolName}
-                  onChange={(e) => setSchoolName(e.target.value)}
-                  placeholder="학교 이름을 입력하세요"
-                  className="w-full px-4 py-3 rounded-xl
-                    border-2 border-blue-200
-                    focus:border-blue-400 focus:ring-2
-                    focus:ring-blue-200 focus:outline-none
-                    transition-all duration-200
-                    placeholder:text-blue-300"
-                  required
-                  minLength={2}
-                />
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="schoolName"
+                    className="block text-lg font-medium text-blue-900 mb-2">
+                    학교 검색
+                  </label>
+                  <input
+                    type="text"
+                    id="schoolName"
+                    value={schoolName}
+                    onChange={(e) => setSchoolName(e.target.value)}
+                    placeholder="학교 이름을 입력하세요"
+                    className="w-full px-4 py-3 rounded-xl
+                      border-2 border-blue-200
+                      focus:border-blue-400 focus:ring-2
+                      focus:ring-blue-200 focus:outline-none
+                      transition-all duration-200
+                      placeholder:text-blue-300"
+                    required
+                    minLength={2}
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="educationOffice"
+                    className="block text-lg font-medium text-blue-900 mb-2">
+                    교육청 선택
+                  </label>
+                  <select
+                    id="educationOffice"
+                    value={office}
+                    onChange={(e) => setOffice(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl
+                      border-2 border-blue-200
+                      focus:border-blue-400 focus:ring-2
+                      focus:ring-blue-200 focus:outline-none
+                      transition-all duration-200
+                      bg-white"
+                  >
+                    {EDUCATION_OFFICES.map((office) => (
+                      <option key={office.code} value={office.code}>
+                        {office.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
               <button
                 type="submit"
