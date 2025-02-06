@@ -9,8 +9,12 @@ interface CalendarConfig {
   schoolCode: string;
   grade?: string;
   class?: string;
+  breakfastStart?: string;
+  breakfastDuration: string;
   lunchStart?: string;
   lunchDuration: string;
+  dinnerStart?: string;
+  dinnerDuration: string;
 }
 
 const buildUrl = (config: CalendarConfig): string => {
@@ -23,9 +27,17 @@ const buildUrl = (config: CalendarConfig): string => {
     }
   }
 
+  if (config.breakfastStart) {
+    url.searchParams.set('breakfast', config.breakfastStart.replace(':', ''));
+    url.searchParams.set('breakfastmins', config.breakfastDuration);
+  }
   if (config.lunchStart) {
     url.searchParams.set('lunch', config.lunchStart.replace(':', ''));
     url.searchParams.set('lunchmins', config.lunchDuration);
+  }
+  if (config.dinnerStart) {
+    url.searchParams.set('dinner', config.dinnerStart.replace(':', ''));
+    url.searchParams.set('dinnermins', config.dinnerDuration);
   }
 
   return url.toString();
@@ -43,6 +55,10 @@ function Page() {
   const [klass, setKlass] = useState<string>('');
   const [lunchStart, setLunchStart] = useState<string>('');
   const [lunchDuration, setLunchDuration] = useState<string>(DEFAULT_LUNCHTIME_DURATION);
+  const [breakfastStart, setBreakfastStart] = useState<string>('');
+  const [breakfastDuration, setBreakfastDuration] = useState<string>(DEFAULT_LUNCHTIME_DURATION);
+  const [dinnerStart, setDinnerStart] = useState<string>('');
+  const [dinnerDuration, setDinnerDuration] = useState<string>(DEFAULT_LUNCHTIME_DURATION);
   const [copySuccess, setCopySuccess] = useState(false);
 
   useEffect(() => {
@@ -50,12 +66,16 @@ function Page() {
       schoolCode,
       grade,
       class: klass,
+      breakfastStart,
+      breakfastDuration,
       lunchStart,
-      lunchDuration: lunchDuration || DEFAULT_LUNCHTIME_DURATION,
+      lunchDuration,
+      dinnerStart,
+      dinnerDuration,
     });
 
     setCalendarUrl(url);
-  }, [schoolCode, grade, klass, lunchStart, lunchDuration]);
+  }, [schoolCode, grade, klass, breakfastStart, breakfastDuration, lunchStart, lunchDuration, dinnerStart, dinnerDuration]);
 
   const handleCopyUrl = async () => {
     try {
@@ -124,8 +144,9 @@ function Page() {
                 </div>
               </div>
 
+
               <div className="pt-6 border-t border-sky-100 space-y-4">
-                <h2 className="text-lg font-medium text-sky-800">점심시간 설정</h2>
+                <h2 className="text-lg font-medium text-sky-800">점심시간 급식 설정</h2>
                 <div>
                   <label className="block text-sm font-medium text-sky-700 mb-2">
                     시작 시간 (선택)
@@ -149,6 +170,76 @@ function Page() {
                       min="1"
                       value={lunchDuration}
                       onChange={(e) => setLunchDuration(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border-2 border-sky-200
+                        focus:border-sky-400 focus:ring-2 focus:ring-sky-200
+                        focus:outline-none transition-all duration-200"
+                      required
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Breakfast Time Section */}
+              <div className="pt-6 border-t border-sky-100 space-y-4">
+                <h2 className="text-lg font-medium text-sky-800">아침시간 급식 설정</h2>
+                <div>
+                  <label className="block text-sm font-medium text-sky-700 mb-2">
+                    시작 시간 (선택)
+                  </label>
+                  <input
+                    type="time"
+                    value={breakfastStart}
+                    onChange={(e) => setBreakfastStart(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border-2 border-sky-200
+                      focus:border-sky-400 focus:ring-2 focus:ring-sky-200
+                      focus:outline-none transition-all duration-200"
+                  />
+                </div>
+                {breakfastStart && (
+                  <div>
+                    <label className="block text-sm font-medium text-sky-700 mb-2">
+                      아침 시간 (분)
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={breakfastDuration}
+                      onChange={(e) => setBreakfastDuration(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border-2 border-sky-200
+                        focus:border-sky-400 focus:ring-2 focus:ring-sky-200
+                        focus:outline-none transition-all duration-200"
+                      required
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Dinner Time Section */}
+              <div className="pt-6 border-t border-sky-100 space-y-4">
+                <h2 className="text-lg font-medium text-sky-800">저녁시간 급식 설정</h2>
+                <div>
+                  <label className="block text-sm font-medium text-sky-700 mb-2">
+                    시작 시간 (선택)
+                  </label>
+                  <input
+                    type="time"
+                    value={dinnerStart}
+                    onChange={(e) => setDinnerStart(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border-2 border-sky-200
+                      focus:border-sky-400 focus:ring-2 focus:ring-sky-200
+                      focus:outline-none transition-all duration-200"
+                  />
+                </div>
+                {dinnerStart && (
+                  <div>
+                    <label className="block text-sm font-medium text-sky-700 mb-2">
+                      저녁 시간 (분)
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={dinnerDuration}
+                      onChange={(e) => setDinnerDuration(e.target.value)}
                       className="w-full px-3 py-2 rounded-lg border-2 border-sky-200
                         focus:border-sky-400 focus:ring-2 focus:ring-sky-200
                         focus:outline-none transition-all duration-200"
